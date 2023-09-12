@@ -7,32 +7,47 @@
 
 import UIKit
 
-class MainViewController: UITableViewController {
+class HomeController: UITableViewController {
+    
+    private let menuWidth = 300.0
+    private let menuController = MenuController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.backgroundColor = .red
         
-        
+        setupNavigationButtons()
+    }
+    
+    private func setupNavigationButtons() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(tappedOpen))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Hide", style: .plain, target: self, action: #selector(tappedHide))
     }
     
     @objc func tappedOpen() {
         print("Opening...")
-        let menuTableViewController = MenuTableViewController()
-        let menuView = menuTableViewController.tableView
-        menuView?.frame = CGRect(x: 0, y: 0, width: 300, height: self.tableView.frame.height)
+        menuController.tableView.frame = CGRect(x: -menuWidth, y: 0, width: menuWidth, height: self.tableView.frame.height)
         let window = UIApplication.shared.keyWindow
-        window?.addSubview(menuTableViewController.tableView)
+        window?.addSubview(menuController.tableView)
+        addChild(menuController)
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1) {
+            self.menuController.tableView.transform = CGAffineTransform(translationX: self.menuWidth, y: 0)
+        }
+        
     }
     
     @objc func tappedHide() {
         print("Hiding...")
+        menuController.removeFromParent()
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1) {
+            self.menuController.tableView.transform = .identity
+        }
     }
 }
 
-extension MainViewController {
+extension HomeController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 5
